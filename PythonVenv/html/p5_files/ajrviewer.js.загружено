@@ -1,0 +1,165 @@
+<!--
+
+  function AJRViewer(reportName) {
+
+    // -- properties --
+    var path_base;
+    var path_data;
+
+    // -- methods --
+    this.setPathBase = (
+        function (value) {
+            path_base = value;
+        }
+    );
+    this.getPathBase = (
+        function getPathBase(value) {
+            return path_base;
+        }
+    );
+
+    this.setPathData = (
+        function (value) {
+            path_data = value;
+        }
+    );
+    this.getPathData = (
+        function getPathData(value) {
+            return path_data;
+        }
+    );
+
+    this.getFormElement= (
+        function getFormElement(name) {
+          return document.getElementById(name);
+        } // function getFormElement
+    );
+
+    this.iif = (
+        function iif(expression, value1, value2) {
+          if (expression) {
+            return value1;
+          } // if
+          return value2;
+        } // function iif
+    );
+
+    this.loadAnimation = (
+        function (ID) {
+          //... load circle ...
+          document.getElementById(ID).innerHTML='<img src="'+this.getPathBase()+'img/loading.gif" style="border:0px"><br>';
+          document.getElementById(ID).style.textAlign="center";
+          document.getElementById(ID).style.margin="10px";
+        } // procedure loadAnimation()
+    );
+
+    this.loadFilter = (
+        function (FileName, FilterName) {
+          //...
+          this.loadResult(FileName, FilterName);
+          return;
+        } // procedure loadFilter()
+    );
+
+    this.loadResult = (
+        function loadResult(FileName, ID) {
+          this.loadAnimation(ID);
+          document.getElementById(ID).innerHTML=document.getElementById(ID).innerHTML+
+                                                '<iframe id="frmResult" style="display: none" onload="ajrviewer.loadResult2(\''+ID+'\')" src="'+FileName+'"></iframe>';
+          //... load data ...
+      //    document.getElementById("frmResult").src = FileName;
+      //!!! не работает только в IE !!!    document.getElementById("frmResult").onload = loadResult2;
+        } // procedure loadResult()
+    );
+
+    this.loadResult2 = (
+        function (ID) {
+          var result_code;
+          var person;
+
+          if (document.getElementById("frmResult").contentDocument) {
+            result_code = document.getElementById("frmResult").contentDocument.body.innerHTML; 
+          }
+          else {
+            if (document.getElementById("frmResult").Document) {
+              result_code = document.getElementById("frmResult").Document.body.innerHTML; 
+            }
+            else {
+              result_code =""; 
+            } // if
+          } // if
+
+// !!!!! В FF после выполнения последней команды продолжается загрузка страницы, хотя она уже доставлена.
+// !!!!! скорее всего, проблема связана с ошибками в использовании (неосвобождении) памяти после таких манипуляций
+// !!!!! разобраться!!!!!!!!!!!!!!!
+
+          if (document.getElementById('tbxPerson')) {
+            person = document.getElementById('tbxPerson').value;
+            if (person.trim().length && person.trim() != '--- фамилия, имя и отчество абитуриента ---') {
+              document.getElementById(ID).innerHTML = this.addAnchor(result_code, person);
+              this.scrollToAnchor("person");
+              document.location.href = "#person";
+              return;
+            } // if
+          } // if
+//alert (result_code);
+          document.getElementById(ID).innerHTML = result_code;
+          return;
+        } // procedure loadResult2()
+    );
+
+    this.addAnchor = (
+        function addAnchor(code, person) {
+      /*
+          var iStart, iFinish, length;
+          iStart  = code.toLowerCase().indexOf(person);
+          iFinish = iStart + person.length();
+      */
+          return code.replace(person, '<a name="person">'+person+'</a>');
+        } // function addAnchor()
+    );
+
+    this.scrollToAnchor= (
+        function (anchor) {
+          document.location.href = "#"+anchor;
+        } // procedure scrollToAnchor()
+    );
+
+    this.loadResult0 = (
+        function () {
+          var base_tag = 'filterItem';
+          var file_name = '';
+          for (i=0; this.getFormElement(base_tag+i); i++) {
+            file_name = file_name + this.getFormElement(base_tag+i).value + '_';
+          } // for
+          if (file_name.length>0 && file_name.substring(file_name.length-1) == '_') {
+            file_name = file_name.substring(0,file_name.length-1)+'.html';
+          } // if
+
+		//alert(this.getPathData() + file_name);
+            
+          this.loadResult(this.getPathBase() + 'findDoc.php?req=' + this.getPathData() + file_name, 'result_container');
+        } // procedure loadResult0()
+    );
+
+    this.init = (
+        function (reportName) {
+        } // procedure init()
+    );
+
+    this.show = (
+        function (ID) {                 
+          var tag = document.getElementById(ID);
+          if (tag) {
+            tag.innerHTML = '<div id="filter_container" style=""></div>' +
+                            '<div id="result_container" style=""></div>';
+            this.loadFilter(this.getPathData()+'filter.html', 'filter_container');
+          } // if
+        } // procedure show()
+    );
+
+    this.init(reportName);
+    return this;
+  } //AJRViewer
+
+//-->
